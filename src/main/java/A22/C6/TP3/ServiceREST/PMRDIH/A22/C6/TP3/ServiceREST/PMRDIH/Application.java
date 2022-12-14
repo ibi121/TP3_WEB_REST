@@ -29,6 +29,8 @@ public class Application {
 
 
 		GestionClients gc = new GestionClients();
+		ServiceRestClient serviceRestClient = new ServiceRestClient();
+
 
 		//sr.PostRequestGeopify();
 		//sr.EnvoiRequeteGeopify();
@@ -44,7 +46,7 @@ public class Application {
 //		System.out.println(jarray);
 
 		sr.RetrouveLatLong(listeAddresse);
-		sr.testOk();
+		//sr.testOk();
 
 	}
 
