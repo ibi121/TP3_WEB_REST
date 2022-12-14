@@ -2,14 +2,21 @@ package A22.C6.TP3.ServiceREST.PMRDIH.A22.C6.TP3.ServiceREST.PMRDIH;
 
 import A22.C6.TP3.ServiceREST.PMRDIH.A22.C6.TP3.ServiceREST.PMRDIH.modele.Client;
 import A22.C6.TP3.ServiceREST.PMRDIH.A22.C6.TP3.ServiceREST.PMRDIH.modele.GestionClients;
+import com.fasterxml.jackson.core.JsonParser;
 import okhttp3.*;
+import org.jetbrains.annotations.NotNull;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -18,16 +25,20 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @Component
 public class ServiceRest {
 
     private GestionClients gestionClients = new GestionClients();
+    String urlTobDeleted = "";
 
-//    @Autowired
-//    public void setGestionClients(GestionClients gestionClients) {
-//        this.gestionClients = gestionClients;
-//    }
+    @Autowired
+    public void setGestionClients(GestionClients gestionClients) {
+        this.gestionClients = gestionClients;
+    }
 
 //    @GetMapping(value = "/client/{adresse}")
 //    public Client getClient(@PathVariable String adresse){
@@ -36,37 +47,33 @@ public class ServiceRest {
 //    }
 
 
-
-
-    public void PostRequestGeopify(){
-
-        String adresse = gestionClients.getListeDeClients().get(3).getAdresse();
-        String adresse1 = gestionClients.getListeDeClients().get(4).getAdresse();
-
-        OkHttpClient client = new OkHttpClient();
-
-        FormBody formBody = new FormBody.Builder()
-                .add("arrival", adresse1)
-                .build();
-        Request request = new Request.Builder()
-                .url("https://api.geoapify.com/v1/batch?id=JOB_ID&apiKey=8fc90cab489e4420b6059a1fdb9f8163")
-                .post(formBody)
-                .build();
-
-        try {
-            Response response = client.newCall(request).execute();
-
-            System.out.println(response);
-
-            // Do something with the response.
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-
-    }
-
-
+//    public void PostRequestGeopify() {
+//
+//        String adresse = gestionClients.getListeDeClients().get(3).getAdresse();
+//        String adresse1 = gestionClients.getListeDeClients().get(4).getAdresse();
+//
+//        OkHttpClient client = new OkHttpClient();
+//
+//        FormBody formBody = new FormBody.Builder()
+//                .add("arrival", adresse1)
+//                .build();
+//        Request request = new Request.Builder()
+//                .url("https://api.geoapify.com/v1/batch?id=JOB_ID&apiKey=8fc90cab489e4420b6059a1fdb9f8163")
+//                .post(formBody)
+//                .build();
+//
+//        try {
+//            Response response = client.newCall(request).execute();
+//
+//            System.out.println(response);
+//
+//            // Do something with the response.
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//
+//
+//    }
 
 
     public void EnvoiRequeteGeopify() throws IOException {
@@ -84,8 +91,10 @@ public class ServiceRest {
 
     }
 
-    public void TrouverLaRouteOptimale() throws IOException {
-        URL url = new URL("https://api.geoapify.com/v1/routeplanner?apiKey=8fc90cab489e4420b6059a1fdb9f8163");
+    public void TrouverLaRouteOptimale() throws IOException, ParseException {
+
+
+        URL url = new URL("https://api.geoapify.com/v1/routeplanner?apiKey=fe815e1c9fc94281b1416e7493715f05");
         HttpURLConnection http = (HttpURLConnection)url.openConnection();
         http.setRequestMethod("POST");
         http.setDoOutput(true);
@@ -98,16 +107,99 @@ public class ServiceRest {
         OutputStream stream = http.getOutputStream();
         stream.write(out);
 
-        System.out.println(stream);
-
         System.out.println(http.getResponseCode() + " " + http.getResponseMessage());
+
+        InputStream inputStream = http.getInputStream();
+        JSONParser jsonParser = new JSONParser();
+        JSONObject jsonObject = (JSONObject) jsonParser.parse(new InputStreamReader(inputStream, "UTF-8"));
+
+        JSONArray features = (JSONArray) jsonObject.get("features");
+        JSONObject transition = (JSONObject) features.get(0);
+        JSONObject geometry = (JSONObject) transition.get("geometry");
+        JSONArray coordinates = (JSONArray) geometry.get("coordinates");
+
+//        System.out.println(transition);
+        System.out.println(geometry.toJSONString());
+
         http.disconnect();
+
+
+
 
     }
 
-//    public void test(){
-//        Path path = Paths.get("test.tztt");
-//        byte[] data = TrouverLaRouteOptimale().readAllBytes(path);
-//    }
+    //Demande la liste original de clients, prends juste les addresses
+    //Les change en jsonArray pour requetes
+    //
+    public void RetrouveLatLong(List<String> listeAddresseParsed) throws IOException, ParseException {
+        List<String> listeLatLong = new ArrayList<>();
+
+        JSONArray addresseJson = new JSONArray();
+
+
+        addresseJson.addAll(listeAddresseParsed);
+
+        String data = addresseJson.toJSONString();
+
+
+        URL url = new URL("https://api.geoapify.com/v1/batch/geocode/search/?apiKey=fe815e1c9fc94281b1416e7493715f05");
+        HttpURLConnection http = (HttpURLConnection)url.openConnection();
+        http.setRequestMethod("POST");
+        http.setDoOutput(true);
+        http.setRequestProperty("Content-Type", "application/json");
+
+        byte[] out = data.getBytes(StandardCharsets.UTF_8);
+
+        OutputStream stream = http.getOutputStream();
+        stream.write(out);
+
+        System.out.println(http.getResponseCode() + " " + http.getResponseMessage());
+
+        InputStream inputStream = http.getInputStream();
+        JSONParser jsonParser = new JSONParser();
+        JSONObject jsonObject = (JSONObject) jsonParser.parse(new InputStreamReader(inputStream, "UTF-8"));
+
+        System.out.println(jsonObject);
+
+        urlTobDeleted = jsonObject.get("url").toString();
+
+    }
+
+    public void testOk() throws IOException {
+        String Url = urlTobDeleted;
+
+
+        OkHttpClient client = new OkHttpClient();
+
+//        HttpUrl.Builder urlBuilder = HttpUrl.parse(urlTobDeleted).newBuilder();
+//                    urlBuilder.query("")
+
+        Request request = new Request.Builder()
+                .url(Url)
+                .method("GET", null)
+                .build();
+
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                if(response.isSuccessful()){
+                    JSONObject reponse =
+                }
+            }
+        });
+//        Response response = client.newCall(request).execute();
+//
+//        System.out.println(response);
+
+
+
+    }
+
+
 
 }

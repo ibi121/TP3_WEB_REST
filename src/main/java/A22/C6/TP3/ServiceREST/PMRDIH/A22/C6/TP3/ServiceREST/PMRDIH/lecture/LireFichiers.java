@@ -52,9 +52,12 @@ public class LireFichiers {
 
         return listeEntrepot;
 
-
-
     }
+
+
+//    public List<String> getLatLong(){
+//
+//    }
 
 }
 
