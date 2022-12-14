@@ -10,17 +10,16 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.client.OkHttp3ClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -95,7 +94,7 @@ public class ServiceRest {
 
 
         URL url = new URL("https://api.geoapify.com/v1/routeplanner?apiKey=fe815e1c9fc94281b1416e7493715f05");
-        HttpURLConnection http = (HttpURLConnection)url.openConnection();
+        HttpURLConnection http = (HttpURLConnection) url.openConnection();
         http.setRequestMethod("POST");
         http.setDoOutput(true);
         http.setRequestProperty("Content-Type", "application/json");
@@ -124,8 +123,6 @@ public class ServiceRest {
         http.disconnect();
 
 
-
-
     }
 
     //Demande la liste original de clients, prends juste les addresses
@@ -143,7 +140,7 @@ public class ServiceRest {
 
 
         URL url = new URL("https://api.geoapify.com/v1/batch/geocode/search/?apiKey=fe815e1c9fc94281b1416e7493715f05");
-        HttpURLConnection http = (HttpURLConnection)url.openConnection();
+        HttpURLConnection http = (HttpURLConnection) url.openConnection();
         http.setRequestMethod("POST");
         http.setDoOutput(true);
         http.setRequestProperty("Content-Type", "application/json");
@@ -165,41 +162,24 @@ public class ServiceRest {
 
     }
 
-    public void testOk() throws IOException {
-        String Url = urlTobDeleted;
-
-
-        OkHttpClient client = new OkHttpClient();
-
-//        HttpUrl.Builder urlBuilder = HttpUrl.parse(urlTobDeleted).newBuilder();
-//                    urlBuilder.query("")
-
-        Request request = new Request.Builder()
-                .url(Url)
-                .method("GET", null)
-                .build();
-
-        client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(@NotNull Call call, @NotNull IOException e) {
-
-            }
-
-            @Override
-            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                if(response.isSuccessful()){
-                    JSONObject reponse =
-                }
-            }
-        });
+//    public void testOk() throws IOException, ParseException {
+//        String Url = urlTobDeleted;
+//
+//
+//        OkHttpClient client = new OkHttpClient();
+//
+//        Request request = new Request.Builder()
+//                .url(Url)
+//                .method("GET", null)
+//                .build();
 //        Response response = client.newCall(request).execute();
 //
-//        System.out.println(response);
-
-
-
-    }
-
-
+//        if(response.isSuccessful()){
+//            response
+//        }
+//
+//    }
+//
+//
 
 }

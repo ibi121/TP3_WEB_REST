@@ -46,7 +46,6 @@ public class Application {
 		sr.RetrouveLatLong(listeAddresse);
 		sr.testOk();
 
-
 	}
 
 
