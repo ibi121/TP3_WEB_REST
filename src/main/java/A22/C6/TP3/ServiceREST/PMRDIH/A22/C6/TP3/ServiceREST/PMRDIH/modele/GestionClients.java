@@ -19,8 +19,6 @@ public class GestionClients {
 
     public GestionClients() {
         this.listeDeClients = this.lireFichierClients();
-
-
     }
 
     public List<Client> getListeDeClients() {

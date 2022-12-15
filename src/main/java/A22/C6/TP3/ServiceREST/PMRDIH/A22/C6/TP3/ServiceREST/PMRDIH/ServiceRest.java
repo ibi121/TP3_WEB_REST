@@ -162,24 +162,24 @@ public class ServiceRest {
 
     }
 
-//    public void testOk() throws IOException, ParseException {
-//        String Url = urlTobDeleted;
-//
-//
-//        OkHttpClient client = new OkHttpClient();
-//
-//        Request request = new Request.Builder()
-//                .url(Url)
-//                .method("GET", null)
-//                .build();
-//        Response response = client.newCall(request).execute();
-//
-//        if(response.isSuccessful()){
-//            response
-//        }
-//
-//    }
-//
-//
+    public void testOk() throws IOException, ParseException {
+        String Url = urlTobDeleted;
 
+
+        URL url = new URL(Url);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestProperty("Accept", "application/json");
+        conn.setRequestMethod("GET");
+
+//        if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
+//            throw new RuntimeException("Failed : HTTP error code : " + conn.getResponseCode());
+//        }
+
+        InputStream inputStream = conn.getInputStream();
+        JSONParser jsonParser = new JSONParser();
+        JSONObject jsonObject = (JSONObject)jsonParser.parse(new InputStreamReader(inputStream, "UTF-8"));
+
+        System.out.println(jsonObject.toJSONString());
+        conn.disconnect();
+    }
 }
