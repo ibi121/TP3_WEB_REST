@@ -1,5 +1,6 @@
-package A22.C6.TP3.ServiceREST.PMRDIH.A22.C6.TP3.ServiceREST.PMRDIH.modele;
+package A22.C6.TP3.ServiceREST.PMRDIH.A22.C6.TP3.ServiceREST.PMRDIH.Gestion;
 
+import A22.C6.TP3.ServiceREST.PMRDIH.A22.C6.TP3.ServiceREST.PMRDIH.modele.Client;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -14,24 +15,24 @@ import java.util.List;
 @Component
 public class GestionClients {
 
-    private List<Client> listeDeClients;
+    private List<Client> listeAdresseClient;
 
 
     public GestionClients() {
-        this.listeDeClients = this.lireFichierClients();
+        this.listeAdresseClient = this.lireFichierClients();
     }
 
-    public List<Client> getListeDeClients() {
-        return listeDeClients;
+    public List<Client> getListeAdresseClient() {
+        return listeAdresseClient;
     }
 
 
     public void AjouterClient(Client client) {
-        this.listeDeClients.add(client);
+        this.listeAdresseClient.add(client);
     }
 
     public void retournerAdresse(int i) {
-        this.listeDeClients.get(i);
+        this.listeAdresseClient.get(i);
     }
 
 

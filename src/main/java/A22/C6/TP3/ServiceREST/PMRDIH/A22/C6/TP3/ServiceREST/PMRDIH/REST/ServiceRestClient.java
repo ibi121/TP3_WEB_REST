@@ -1,11 +1,10 @@
-package A22.C6.TP3.ServiceREST.PMRDIH.A22.C6.TP3.ServiceREST.PMRDIH;
+package A22.C6.TP3.ServiceREST.PMRDIH.A22.C6.TP3.ServiceREST.PMRDIH.REST;
 
 
-import A22.C6.TP3.ServiceREST.PMRDIH.A22.C6.TP3.ServiceREST.PMRDIH.modele.BD;
+import A22.C6.TP3.ServiceREST.PMRDIH.A22.C6.TP3.ServiceREST.PMRDIH.BD.BD;
 import A22.C6.TP3.ServiceREST.PMRDIH.A22.C6.TP3.ServiceREST.PMRDIH.modele.Client;
-import A22.C6.TP3.ServiceREST.PMRDIH.A22.C6.TP3.ServiceREST.PMRDIH.modele.GestionClients;
+import A22.C6.TP3.ServiceREST.PMRDIH.A22.C6.TP3.ServiceREST.PMRDIH.Gestion.GestionClients;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,13 +27,13 @@ public class ServiceRestClient {
     @GetMapping(value = "/adresses")
     public List<String> getAdressesClient() {
         List<String> adresses = new ArrayList<>();
-        adresses = gestionClients.getListeDeClients().stream().map(Client::getAdresse).collect(Collectors.toList());
+        adresses = gestionClients.getListeAdresseClient().stream().map(Client::getAdresse).collect(Collectors.toList());
         return adresses;
     }
 
     @GetMapping(value = "/client/all")
     public List<Client> getClients(){
-        return gestionClients.getListeDeClients();
+        return gestionClients.getListeAdresseClient();
     }
 
     @PostMapping(value = "/client")

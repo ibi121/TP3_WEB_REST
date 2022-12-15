@@ -1,4 +1,4 @@
-package A22.C6.TP3.ServiceREST.PMRDIH.A22.C6.TP3.ServiceREST.PMRDIH.modele;
+package A22.C6.TP3.ServiceREST.PMRDIH.A22.C6.TP3.ServiceREST.PMRDIH.BD;
 
 import java.util.ArrayList;
 import java.util.List;

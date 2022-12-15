@@ -1,37 +1,28 @@
 package A22.C6.TP3.ServiceREST.PMRDIH.A22.C6.TP3.ServiceREST.PMRDIH;
 
+import A22.C6.TP3.ServiceREST.PMRDIH.A22.C6.TP3.ServiceREST.PMRDIH.Gestion.GestionClients;
+import A22.C6.TP3.ServiceREST.PMRDIH.A22.C6.TP3.ServiceREST.PMRDIH.Gestion.GestionEntrepot;
 import A22.C6.TP3.ServiceREST.PMRDIH.A22.C6.TP3.ServiceREST.PMRDIH.modele.Client;
-import A22.C6.TP3.ServiceREST.PMRDIH.A22.C6.TP3.ServiceREST.PMRDIH.modele.GestionClients;
-import com.fasterxml.jackson.core.JsonParser;
 import okhttp3.*;
-import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.client.OkHttp3ClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.io.*;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Component
-public class ServiceRest {
+public class API {
 
     private GestionClients gestionClients = new GestionClients();
+    private GestionEntrepot gestionEntrepot;
     String urlTobDeleted = "";
 
     @Autowired
@@ -39,7 +30,12 @@ public class ServiceRest {
         this.gestionClients = gestionClients;
     }
 
-//    @GetMapping(value = "/client/{adresse}")
+    @Autowired
+    public void setGestionEntrepot(GestionEntrepot gestionEntrepot) {
+        this.gestionEntrepot = gestionEntrepot;
+    }
+
+    //    @GetMapping(value = "/client/{adresse}")
 //    public Client getClient(@PathVariable String adresse){
 //
 //
@@ -75,18 +71,90 @@ public class ServiceRest {
 //    }
 
 
-    public void EnvoiRequeteGeopify() throws IOException {
-        String adresse1 = gestionClients.getListeDeClients().get(4).getAdresse();
+//    public void EnvoiRequeteGeopify() throws IOException {
+//        String adresse1 = gestionClients.getListeAdresseClient().get(4).getAdresse();
+//
+//        OkHttpClient client = new OkHttpClient().newBuilder()
+//                .build();
+//        Request request = new Request.Builder()
+//                .url("https://api.geoapify.com/v1/geocode/search?apiKey=8fc90cab489e4420b6059a1fdb9f8163")
+//                .method("GET", null)
+//                .build();
+//        Response response = client.newCall(request).execute();
+//
+//        System.out.println(response);
+//
+//    }
+
+
+    public void TrouverLongLatCLient() throws IOException, ParseException {
+        List<String> adresseClient = new ArrayList<>();
+
+        for (Client client:this.gestionClients.getListeAdresseClient()) {
+            adresseClient.add(client.getAdresse());
+        }
+
+        InscriptLongLatObj(adresseClient.get(0).toString());
+    }
+
+    public boolean InscriptLongLatObj(String addresseAchanger) throws IOException, ParseException {
+        boolean isChanged = false;
+        String apiKey = "8fc90cab489e4420b6059a1fdb9f8163";
 
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
+
+        HttpUrl.Builder urlBuilder = HttpUrl.parse("https://api.geoapify.com/v1/geocode/search?").newBuilder();
+            urlBuilder.addQueryParameter("apiKey", apiKey);
+            urlBuilder.addQueryParameter("text", addresseAchanger);
+            String url = urlBuilder.build().toString();
+
         Request request = new Request.Builder()
-                .url("https://api.geoapify.com/v1/geocode/search?apiKey=8fc90cab489e4420b6059a1fdb9f8163")
+                .url(url)
                 .method("GET", null)
                 .build();
         Response response = client.newCall(request).execute();
 
-        System.out.println(response);
+        if(response.isSuccessful()){
+            isChanged = true;
+            System.out.println(response);
+
+            String reponseJson = response.body().string();
+            
+            JSONParser jsonParser = new JSONParser();
+            JSONObject jsonObject = (JSONObject) jsonParser.parse(reponseJson);
+
+            JSONArray features = (JSONArray) jsonObject.get("features");
+            JSONObject idk = (JSONObject) features.get(0);
+            JSONObject properties = (JSONObject) idk.get("properties");
+
+            String longitudeClient = properties.get("lon").toString();
+            String latitudeClient = properties.get("lat").toString();
+
+        }else {
+            isChanged = false;
+        }
+
+        return isChanged;
+
+
+
+//        URL url = new URL("https://api.geoapify.com/v1/geocode/search?apiKey=8fc90cab489e4420b6059a1fdb9f8163");
+//        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+//        conn.setRequestProperty("Accept", "application/json");
+//        conn.setRequestMethod("GET");
+//
+//
+//        if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
+//            throw new RuntimeException("Failed : HTTP error code : " + conn.getResponseCode());
+//        }
+//
+//        InputStream inputStream = conn.getInputStream();
+//        JSONParser jsonParser = new JSONParser();
+//        JSONObject jsonObject = (JSONObject)jsonParser.parse(new InputStreamReader(inputStream, "UTF-8"));
+//        conn.disconnect();
+
+
 
     }
 
@@ -139,47 +207,33 @@ public class ServiceRest {
         String data = addresseJson.toJSONString();
 
 
+        //requetes envoye
         URL url = new URL("https://api.geoapify.com/v1/batch/geocode/search/?apiKey=fe815e1c9fc94281b1416e7493715f05");
         HttpURLConnection http = (HttpURLConnection) url.openConnection();
         http.setRequestMethod("POST");
         http.setDoOutput(true);
         http.setRequestProperty("Content-Type", "application/json");
 
+        //creer tableau de bytes pour la requetes
         byte[] out = data.getBytes(StandardCharsets.UTF_8);
 
         OutputStream stream = http.getOutputStream();
         stream.write(out);
 
-        System.out.println(http.getResponseCode() + " " + http.getResponseMessage());
-
+        //lis la reponse
         InputStream inputStream = http.getInputStream();
         JSONParser jsonParser = new JSONParser();
         JSONObject jsonObject = (JSONObject) jsonParser.parse(new InputStreamReader(inputStream, "UTF-8"));
 
         System.out.println(jsonObject);
 
+        /**
+         * To BE DELETED, URL global qui ne doit pas exister pour l'instant :o(
+         */
         urlTobDeleted = jsonObject.get("url").toString();
 
+        System.out.println(urlTobDeleted);
+
     }
 
-    public void testOk() throws IOException, ParseException {
-        String Url = urlTobDeleted;
-
-
-        URL url = new URL(Url);
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setRequestProperty("Accept", "application/json");
-        conn.setRequestMethod("GET");
-
-//        if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
-//            throw new RuntimeException("Failed : HTTP error code : " + conn.getResponseCode());
-//        }
-
-        InputStream inputStream = conn.getInputStream();
-        JSONParser jsonParser = new JSONParser();
-        JSONObject jsonObject = (JSONObject)jsonParser.parse(new InputStreamReader(inputStream, "UTF-8"));
-
-        System.out.println(jsonObject.toJSONString());
-        conn.disconnect();
-    }
 }
