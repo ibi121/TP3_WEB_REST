@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="ecce36a4-af4f-4f1e-a286-4cf9cac8b5a8" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.mvn/wrapper/maven-wrapper.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.mvn/wrapper/maven-wrapper.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Travail/clients.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Travail/entrepot.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/mvnw" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/mvnw.cmd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/A22/C6/TP3/ServiceREST/PMRDIH/A22/C6/TP3/ServiceREST/PMRDIH/API.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/A22/C6/TP3/ServiceREST/PMRDIH/A22/C6/TP3/ServiceREST/PMRDIH/Application.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/A22/C6/TP3/ServiceREST/PMRDIH/A22/C6/TP3/ServiceREST/PMRDIH/BD/BD.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/A22/C6/TP3/ServiceREST/PMRDIH/A22/C6/TP3/ServiceREST/PMRDIH/Gestion/GestionClients.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/A22/C6/TP3/ServiceREST/PMRDIH/A22/C6/TP3/ServiceREST/PMRDIH/Gestion/GestionEntrepot.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/A22/C6/TP3/ServiceREST/PMRDIH/A22/C6/TP3/ServiceREST/PMRDIH/REST/ServiceRestClient.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/A22/C6/TP3/ServiceREST/PMRDIH/A22/C6/TP3/ServiceREST/PMRDIH/ServletInitializer.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/A22/C6/TP3/ServiceREST/PMRDIH/A22/C6/TP3/ServiceREST/PMRDIH/modele/Client.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/A22/C6/TP3/ServiceREST/PMRDIH/A22/C6/TP3/ServiceREST/PMRDIH/modele/Entrepot.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/A22/C6/TP3/ServiceREST/PMRDIH/A22/C6/TP3/ServiceREST/PMRDIH/ApplicationTests.java" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="mavenHome" value="Use Maven wrapper" />
+        <option name="useMavenConfig" value="true" />
+      </MavenGeneralSettings>
+    </option>
+  </component>
+  <component name="ProjectId" id="2Iv5BHNJC8rG26BAKJ2Wlx9TW2w" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "last_opened_file_path": "C:/Users/Proprio/Desktop/TP3 WEB/Server Service REST",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "spring.configuration.checksum": "9ec9021dd3aa4a31c89f9e7e75092334"
+  }
+}]]></component>
+  <component name="RunManager">
+    <configuration name="Application" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+      <option name="ACTIVE_PROFILES" />
+      <module name="A22.5C6.TP3.ServiceREST.PMRDIH" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="A22.C6.TP3.ServiceREST.PMRDIH.A22.C6.TP3.ServiceREST.PMRDIH.Application" />
+      <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$/Travail" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="ecce36a4-af4f-4f1e-a286-4cf9cac8b5a8" name="Changes" comment="" />
+      <created>1671049079773</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1671049079773</updated>
+      <workItem from="1671049081324" duration="1636000" />
+      <workItem from="1671056747065" duration="5564000" />
+      <workItem from="1671120487443" duration="3767000" />
+      <workItem from="1671297178784" duration="168000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>
