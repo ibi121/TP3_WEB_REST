@@ -17,9 +17,14 @@ import java.util.List;
 public class GestionEntrepot {
     private List<Entrepot> listeAdresseEntrepot;
 
-    public GestionEntrepot(List<Entrepot> listeAdresseEntrepot) {
+    public GestionEntrepot() {
         this.listeAdresseEntrepot = this.LireFichierEntrepot();
     }
+
+    public List<Entrepot> getListeAdresseEntrepot() {
+        return listeAdresseEntrepot;
+    }
+
 
     public List<Entrepot> LireFichierEntrepot() {
 

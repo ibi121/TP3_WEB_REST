@@ -3,6 +3,7 @@ package A22.C6.TP3.ServiceREST.PMRDIH.A22.C6.TP3.ServiceREST.PMRDIH;
 import A22.C6.TP3.ServiceREST.PMRDIH.A22.C6.TP3.ServiceREST.PMRDIH.Gestion.GestionClients;
 import A22.C6.TP3.ServiceREST.PMRDIH.A22.C6.TP3.ServiceREST.PMRDIH.Gestion.GestionEntrepot;
 import A22.C6.TP3.ServiceREST.PMRDIH.A22.C6.TP3.ServiceREST.PMRDIH.modele.Client;
+import A22.C6.TP3.ServiceREST.PMRDIH.A22.C6.TP3.ServiceREST.PMRDIH.modele.Entrepot;
 import okhttp3.*;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -22,7 +23,7 @@ import java.util.List;
 public class API {
 
     private GestionClients gestionClients = new GestionClients();
-    private GestionEntrepot gestionEntrepot;
+    private GestionEntrepot gestionEntrepot = new GestionEntrepot();
     String urlTobDeleted = "";
 
     @Autowired
@@ -35,79 +36,124 @@ public class API {
         this.gestionEntrepot = gestionEntrepot;
     }
 
-    //    @GetMapping(value = "/client/{adresse}")
-//    public Client getClient(@PathVariable String adresse){
-//
-//
-//    }
-
-
-//    public void PostRequestGeopify() {
-//
-//        String adresse = gestionClients.getListeDeClients().get(3).getAdresse();
-//        String adresse1 = gestionClients.getListeDeClients().get(4).getAdresse();
-//
-//        OkHttpClient client = new OkHttpClient();
-//
-//        FormBody formBody = new FormBody.Builder()
-//                .add("arrival", adresse1)
-//                .build();
-//        Request request = new Request.Builder()
-//                .url("https://api.geoapify.com/v1/batch?id=JOB_ID&apiKey=8fc90cab489e4420b6059a1fdb9f8163")
-//                .post(formBody)
-//                .build();
-//
-//        try {
-//            Response response = client.newCall(request).execute();
-//
-//            System.out.println(response);
-//
-//            // Do something with the response.
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//
-//
-//    }
-
-
-//    public void EnvoiRequeteGeopify() throws IOException {
-//        String adresse1 = gestionClients.getListeAdresseClient().get(4).getAdresse();
-//
-//        OkHttpClient client = new OkHttpClient().newBuilder()
-//                .build();
-//        Request request = new Request.Builder()
-//                .url("https://api.geoapify.com/v1/geocode/search?apiKey=8fc90cab489e4420b6059a1fdb9f8163")
-//                .method("GET", null)
-//                .build();
-//        Response response = client.newCall(request).execute();
-//
-//        System.out.println(response);
-//
-//    }
-
-
-    public void TrouverLongLatCLient() throws IOException, ParseException {
-        List<String> adresseClient = new ArrayList<>();
-
-        for (Client client:this.gestionClients.getListeAdresseClient()) {
-            adresseClient.add(client.getAdresse());
+    /**
+     * Loop les clients et set leur latlong avec la methode ChangerAdressEnLatLong
+     *
+     * @throws IOException
+     * @throws ParseException
+     */
+    public boolean AjouterLatLongCLient() throws IOException, ParseException {
+        for (Client client : this.gestionClients.getListeAdresseClient()) {
+            client.setLatLong(this.ChangerAdresseEnLatLong(client.getAdresse()));
         }
 
-        InscriptLongLatObj(adresseClient.get(0).toString());
+        return true;
+
+
     }
 
-    public boolean InscriptLongLatObj(String addresseAchanger) throws IOException, ParseException {
+
+    /**
+     * Meme chose, mais pour l'entrepot :o)
+     *
+     * @throws IOException
+     * @throws ParseException
+     */
+    public boolean AjouterLatLongEntrpot() throws IOException, ParseException {
+        for (Entrepot entrepot : this.gestionEntrepot.getListeAdresseEntrepot()) {
+            entrepot.setLatLong(this.ChangerAdresseEnLatLong(entrepot.getAdresse()));
+        }
+
+        return true;
+
+    }
+
+    /**
+     * JE PENSE QU'IL Y A UNE MEILLEURE FACON DE FAIRE QUE CA
+     * MAIS C'EST TOUT CE QUE J'AI TROUVER
+     * Y EST TARD PI J'AI HIT LE BONG
+     * CA PROGRAMME PAS FORT FORT :o)
+     */
+
+    /**
+     * Update, ca fonctionne ish.. la requete se creer
+     * mais les jobs viennet avanmt les agents alors que ca devrait etre the other way around.
+     * idk why,
+     * si vous essayer : https://myprojects.geoapify.com/api/PmaKvLtvGdCDfeLfE5PV/keys
+     * Suivre le liens pour voir ca ressemble a quoi le body.
+     *
+     * bye --JauneAttend
+     */
+    public String CreerRequeteDepart() throws IOException, ParseException {
+        JSONObject rootJsonRequqtes = new JSONObject();
+        JSONArray jobs = new JSONArray();
+        JSONArray agents = new JSONArray();
+//        JSONArray start_location_array = new JSONArray();
+//        JSONArray end_location_array = new JSONArray();
+
+
+        if (AjouterLatLongEntrpot() && AjouterLatLongCLient()) {
+//            start_location_array.addAll(this.gestionEntrepot.getListeAdresseEntrepot().get(0).getLatLong());
+//            end_location_array.addAll(this.gestionEntrepot.getListeAdresseEntrepot().get(0).getLatLong());
+
+            JSONObject requeteAgent = new JSONObject();
+            requeteAgent.put("start_location", this.gestionEntrepot.getListeAdresseEntrepot().get(0).getLatLong());
+            requeteAgent.put("end_location", this.gestionEntrepot.getListeAdresseEntrepot().get(0).getLatLong());
+            requeteAgent.put("pickup_capacity", 4);
+
+            agents.add(requeteAgent);
+
+            rootJsonRequqtes.put("mode", "drive");
+
+
+            for (Client client:this.gestionClients.getListeAdresseClient()) {
+                JSONObject requqteClient = new JSONObject();
+                JSONArray locationJsonArray = new JSONArray();
+//                locationJsonArray.add(client.getLatLong());
+
+                requqteClient.put("location", client.getLatLong());
+                requqteClient.put("duration", 300);
+                requqteClient.put("pickup_amount", 1);
+
+                jobs.add(requqteClient);
+            }
+
+            rootJsonRequqtes.put("agents", agents);
+            rootJsonRequqtes.put("jobs", jobs);
+
+
+            String test = rootJsonRequqtes.toJSONString();
+
+            System.out.println(test);
+
+        }
+        return "rien";
+    }
+
+    /**
+     * Recoit une adresse,
+     * fait un appel POST a geoapify, geocoding,
+     * Tri le JSON pour y prendre la Lat et Long
+     * Les rajoute dans une liste
+     * et les retourne a la methode AjouterLatLongClient.
+     *
+     * @param addresseAchanger
+     * @return
+     * @throws IOException
+     * @throws ParseException
+     */
+    public List<String> ChangerAdresseEnLatLong(String addresseAchanger) throws IOException, ParseException {
         boolean isChanged = false;
         String apiKey = "8fc90cab489e4420b6059a1fdb9f8163";
+        List<String> latLongToBreturned = new ArrayList<>();
 
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
 
         HttpUrl.Builder urlBuilder = HttpUrl.parse("https://api.geoapify.com/v1/geocode/search?").newBuilder();
-            urlBuilder.addQueryParameter("apiKey", apiKey);
-            urlBuilder.addQueryParameter("text", addresseAchanger);
-            String url = urlBuilder.build().toString();
+        urlBuilder.addQueryParameter("apiKey", apiKey);
+        urlBuilder.addQueryParameter("text", addresseAchanger);
+        String url = urlBuilder.build().toString();
 
         Request request = new Request.Builder()
                 .url(url)
@@ -115,12 +161,12 @@ public class API {
                 .build();
         Response response = client.newCall(request).execute();
 
-        if(response.isSuccessful()){
+        if (response.isSuccessful()) {
             isChanged = true;
             System.out.println(response);
 
             String reponseJson = response.body().string();
-            
+
             JSONParser jsonParser = new JSONParser();
             JSONObject jsonObject = (JSONObject) jsonParser.parse(reponseJson);
 
@@ -131,43 +177,22 @@ public class API {
             String longitudeClient = properties.get("lon").toString();
             String latitudeClient = properties.get("lat").toString();
 
-        }else {
+
+            latLongToBreturned.add(latitudeClient);
+            latLongToBreturned.add(longitudeClient);
+
+        } else {
             isChanged = false;
         }
-
-        return isChanged;
-
-
-
-//        URL url = new URL("https://api.geoapify.com/v1/geocode/search?apiKey=8fc90cab489e4420b6059a1fdb9f8163");
-//        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-//        conn.setRequestProperty("Accept", "application/json");
-//        conn.setRequestMethod("GET");
-//
-//
-//        if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
-//            throw new RuntimeException("Failed : HTTP error code : " + conn.getResponseCode());
-//        }
-//
-//        InputStream inputStream = conn.getInputStream();
-//        JSONParser jsonParser = new JSONParser();
-//        JSONObject jsonObject = (JSONObject)jsonParser.parse(new InputStreamReader(inputStream, "UTF-8"));
-//        conn.disconnect();
-
-
-
+        return latLongToBreturned;
     }
 
-    public void TrouverLaRouteOptimale() throws IOException, ParseException {
-
-
+    public void TrouverLaRouteOptimale(String data) throws IOException, ParseException {
         URL url = new URL("https://api.geoapify.com/v1/routeplanner?apiKey=fe815e1c9fc94281b1416e7493715f05");
         HttpURLConnection http = (HttpURLConnection) url.openConnection();
         http.setRequestMethod("POST");
         http.setDoOutput(true);
         http.setRequestProperty("Content-Type", "application/json");
-
-        String data = "{\"mode\":\"drive\",\"agents\":[{\"start_location\":[10.985736727197894,48.2649593],\"end_location\":[10.896261152517647,48.33227795],\"pickup_capacity\":4},{\"start_location\":[10.984995162319564,48.264409],\"end_location\":[10.896261152517647,48.33227795],\"pickup_capacity\":7},{\"start_location\":[10.990289270853658,48.2675442],\"end_location\":[10.896261152517647,48.33227795],\"pickup_capacity\":4},{\"start_location\":[10.987279662433057,48.2677992],\"end_location\":[10.896261152517647,48.33227795],\"pickup_capacity\":7},{\"start_location\":[10.983010635351173,48.262753950000004],\"end_location\":[10.896261152517647,48.33227795],\"pickup_capacity\":4}],\"jobs\":[{\"location\":[10.98698105,48.25615875],\"duration\":300,\"pickup_amount\":1},{\"location\":[10.9845547,48.26311145],\"duration\":300,\"pickup_amount\":1},{\"location\":[10.984630924828402,48.263248250000004],\"duration\":300,\"pickup_amount\":2},{\"location\":[10.968364837855287,48.262043399999996],\"duration\":300,\"pickup_amount\":1},{\"location\":[10.984364769628737,48.25542385],\"duration\":300,\"pickup_amount\":1},{\"location\":[10.984062746838354,48.25549435],\"duration\":300,\"pickup_amount\":1},{\"location\":[10.983802751265776,48.25558745],\"duration\":300,\"pickup_amount\":2},{\"location\":[10.983222005227521,48.255775],\"duration\":300,\"pickup_amount\":1},{\"location\":[10.983499356818182,48.25569725],\"duration\":300,\"pickup_amount\":1},{\"location\":[10.982919152872745,48.2558497],\"duration\":300,\"pickup_amount\":1},{\"location\":[10.983681544239769,48.25621035],\"duration\":300,\"pickup_amount\":2},{\"location\":[10.983236456481574,48.2560687],\"duration\":300,\"pickup_amount\":1},{\"location\":[10.984312143079265,48.25577875],\"duration\":300,\"pickup_amount\":1},{\"location\":[10.981143603167904,48.257296600000004],\"duration\":300,\"pickup_amount\":1},{\"location\":[10.9807393,48.25748695],\"duration\":300,\"pickup_amount\":1},{\"location\":[10.981209348235852,48.25786594111741],\"duration\":300,\"pickup_amount\":1},{\"location\":[10.980955539642784,48.2562265],\"duration\":300,\"pickup_amount\":1},{\"location\":[10.979089323915998,48.25726365],\"duration\":300,\"pickup_amount\":1},{\"location\":[10.979089323915998,48.25726365],\"duration\":300,\"pickup_amount\":1},{\"location\":[10.978800955841443,48.25723825],\"duration\":300,\"pickup_amount\":1}]}";
 
         byte[] out = data.getBytes(StandardCharsets.UTF_8);
 
@@ -187,15 +212,36 @@ public class API {
 
 //        System.out.println(transition);
         System.out.println(geometry.toJSONString());
-
         http.disconnect();
-
-
     }
 
     //Demande la liste original de clients, prends juste les addresses
     //Les change en jsonArray pour requetes
     //
+
+    /**
+     * this is the caca section
+     * Must be destroyed before sending
+     * :o)
+     * Au plisir
+     * rien de neuf sous le soleil
+     */
+
+
+//        URL url = new URL("https://api.geoapify.com/v1/geocode/search?apiKey=8fc90cab489e4420b6059a1fdb9f8163");
+//        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+//        conn.setRequestProperty("Accept", "application/json");
+//        conn.setRequestMethod("GET");
+//
+//
+//        if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
+//            throw new RuntimeException("Failed : HTTP error code : " + conn.getResponseCode());
+//        }
+//
+//        InputStream inputStream = conn.getInputStream();
+//        JSONParser jsonParser = new JSONParser();
+//        JSONObject jsonObject = (JSONObject)jsonParser.parse(new InputStreamReader(inputStream, "UTF-8"));
+//        conn.disconnect();
     public void RetrouveLatLong(List<String> listeAddresseParsed) throws IOException, ParseException {
         List<String> listeLatLong = new ArrayList<>();
 
@@ -235,5 +281,6 @@ public class API {
         System.out.println(urlTobDeleted);
 
     }
+
 
 }

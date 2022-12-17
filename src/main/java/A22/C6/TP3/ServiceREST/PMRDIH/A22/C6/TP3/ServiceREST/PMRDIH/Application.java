@@ -17,21 +17,16 @@ public class Application {
 
     public static void main(String[] args) throws IOException, ParseException {
         SpringApplication.run(Application.class, args);
-        API sr = new API();
+        API api = new API();
 
-        List<String> listeAddresse = new ArrayList<>();
-
-
+//        List<String> listeAddresse = new ArrayList<>();
         GestionClients gc = new GestionClients();
         ServiceRestClient serviceRestClient = new ServiceRestClient();
 
-
-        for (Client client : gc.lireFichierClients()) {
-            listeAddresse.add(client.getAdresse());
-        }
+        api.CreerRequeteDepart();
 
 
-        sr.TrouverLongLatCLient();
+
 
 
     }
