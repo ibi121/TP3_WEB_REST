@@ -47,7 +47,7 @@ public class GestionClients {
             JSONArray clients = (JSONArray) a.get("clients");
             for (Object o: clients) {
                 JSONObject x = (JSONObject) o;
-                listeDeClients.add(new Client(id, String.valueOf(x.get("nom")), String.valueOf(x.get("adresse"))));
+                listeDeClients.add(new Client(id, String.valueOf(x.get("nom")), String.valueOf(x.get("adresse")), ""));
                 id++;
             }
 

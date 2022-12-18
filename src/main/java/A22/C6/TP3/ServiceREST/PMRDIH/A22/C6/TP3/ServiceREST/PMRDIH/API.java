@@ -2,8 +2,10 @@ package A22.C6.TP3.ServiceREST.PMRDIH.A22.C6.TP3.ServiceREST.PMRDIH;
 
 import A22.C6.TP3.ServiceREST.PMRDIH.A22.C6.TP3.ServiceREST.PMRDIH.Gestion.GestionClients;
 import A22.C6.TP3.ServiceREST.PMRDIH.A22.C6.TP3.ServiceREST.PMRDIH.Gestion.GestionEntrepot;
+import A22.C6.TP3.ServiceREST.PMRDIH.A22.C6.TP3.ServiceREST.PMRDIH.Patente.JsonObjectModified;
 import A22.C6.TP3.ServiceREST.PMRDIH.A22.C6.TP3.ServiceREST.PMRDIH.modele.Client;
 import A22.C6.TP3.ServiceREST.PMRDIH.A22.C6.TP3.ServiceREST.PMRDIH.modele.Entrepot;
+import com.google.gson.Gson;
 import okhttp3.*;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -13,11 +15,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
+import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+
+/**
+ * Les adresses ne sont pas bonnes.. je ne sais pas pourquoi, ca me fait vraiment vraiment chier,
+ * Je suis vraiment proche de l'avoir.
+ *
+ * Si vous voulez tester, regarder avec postman les resultats et les resultats recu ici.
+ *
+ * En gros, nous avons des requetes qui ne retourne pas les bonne choses.
+ *
+ * 
+ */
 
 @Component
 public class API {
@@ -37,19 +53,39 @@ public class API {
     }
 
     /**
+     * Adresses are formatted and returned
+     * @return
+     */
+    public boolean AddresseFormattedForSending(){
+        for (Client client: this.gestionClients.getListeAdresseClient()) {
+            String adresseOriginal = client.getAdresse();
+            System.out.println(adresseOriginal);
+            adresseOriginal = adresseOriginal.replace("-", "%2D");
+            adresseOriginal = adresseOriginal.replace("é", "e");
+            adresseOriginal = adresseOriginal.replace("'", "%27");
+
+            client.setAddresseFormatter(adresseOriginal);
+
+            System.out.println(client.getAddresseFormatter());
+
+        }
+        return true;
+
+    }
+
+    /**
      * Loop les clients et set leur latlong avec la methode ChangerAdressEnLatLong
      *
      * @throws IOException
      * @throws ParseException
      */
     public boolean AjouterLatLongCLient() throws IOException, ParseException {
-        for (Client client : this.gestionClients.getListeAdresseClient()) {
-            client.setLatLong(this.ChangerAdresseEnLatLong(client.getAdresse()));
+        if(AddresseFormattedForSending()) {
+            for (Client client : this.gestionClients.getListeAdresseClient()) {
+                client.setLatLong(this.ChangerAdresseEnLatLong(client.getAddresseFormatter()));
+            }
         }
-
-        return true;
-
-
+        return false;
     }
 
 
@@ -64,16 +100,9 @@ public class API {
             entrepot.setLatLong(this.ChangerAdresseEnLatLong(entrepot.getAdresse()));
         }
 
-        return true;
+        return false;
 
     }
-
-    /**
-     * JE PENSE QU'IL Y A UNE MEILLEURE FACON DE FAIRE QUE CA
-     * MAIS C'EST TOUT CE QUE J'AI TROUVER
-     * Y EST TARD PI J'AI HIT LE BONG
-     * CA PROGRAMME PAS FORT FORT :o)
-     */
 
     /**
      * Update, ca fonctionne ish.. la requete se creer
@@ -84,51 +113,37 @@ public class API {
      *
      * bye --JauneAttend
      */
-    public String CreerRequeteDepart() throws IOException, ParseException {
-        JSONObject rootJsonRequqtes = new JSONObject();
-        JSONArray jobs = new JSONArray();
-        JSONArray agents = new JSONArray();
-//        JSONArray start_location_array = new JSONArray();
-//        JSONArray end_location_array = new JSONArray();
+//    public String CreerRequeteDepart() throws IOException, ParseException {
+//        JsonObjectModified requeteDate = new JsonObjectModified();
+//        JSONArray jobs = new JSONArray();
+//        JSONArray agents = new JSONArray();
+//
+//        if (AjouterLatLongEntrpot() && AjouterLatLongCLient()) {
+//            JSONObject requeteAgent = new JSONObject();
+//            requeteAgent.put("start_location", this.gestionEntrepot.getListeAdresseEntrepot().get(0).getLatLong());
+//            requeteAgent.put("end_location", this.gestionEntrepot.getListeAdresseEntrepot().get(0).getLatLong());
+//            requeteAgent.put("pickup_capacity", 4);
+//
+//            agents.add(requeteAgent);
+//
+//            for (Client client:this.gestionClients.getListeAdresseClient()) {
+//                JSONObject requqteClient = new JSONObject();
+//
+//                requqteClient.put("location", client.getLatLong());
+//                requqteClient.put("duration", 300);
+//                requqteClient.put("pickup_amount", 1);
+//
+//                jobs.add(requqteClient);
+//            }
+//        }else {
+//            System.out.println("not working");
+//        }
+//
+//        System.out.println(requeteDate.CustomJsonObject(agents, jobs).toJSONString());
+//        return requeteDate.CustomJsonObject(agents, jobs).toJSONString();
+//    }
+//
 
-
-        if (AjouterLatLongEntrpot() && AjouterLatLongCLient()) {
-//            start_location_array.addAll(this.gestionEntrepot.getListeAdresseEntrepot().get(0).getLatLong());
-//            end_location_array.addAll(this.gestionEntrepot.getListeAdresseEntrepot().get(0).getLatLong());
-
-            JSONObject requeteAgent = new JSONObject();
-            requeteAgent.put("start_location", this.gestionEntrepot.getListeAdresseEntrepot().get(0).getLatLong());
-            requeteAgent.put("end_location", this.gestionEntrepot.getListeAdresseEntrepot().get(0).getLatLong());
-            requeteAgent.put("pickup_capacity", 4);
-
-            agents.add(requeteAgent);
-
-            rootJsonRequqtes.put("mode", "drive");
-
-
-            for (Client client:this.gestionClients.getListeAdresseClient()) {
-                JSONObject requqteClient = new JSONObject();
-                JSONArray locationJsonArray = new JSONArray();
-//                locationJsonArray.add(client.getLatLong());
-
-                requqteClient.put("location", client.getLatLong());
-                requqteClient.put("duration", 300);
-                requqteClient.put("pickup_amount", 1);
-
-                jobs.add(requqteClient);
-            }
-
-            rootJsonRequqtes.put("agents", agents);
-            rootJsonRequqtes.put("jobs", jobs);
-
-
-            String test = rootJsonRequqtes.toJSONString();
-
-            System.out.println(test);
-
-        }
-        return "rien";
-    }
 
     /**
      * Recoit une adresse,
@@ -143,18 +158,21 @@ public class API {
      * @throws ParseException
      */
     public List<String> ChangerAdresseEnLatLong(String addresseAchanger) throws IOException, ParseException {
-        boolean isChanged = false;
         String apiKey = "8fc90cab489e4420b6059a1fdb9f8163";
+
         List<String> latLongToBreturned = new ArrayList<>();
+
 
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
+
 
         HttpUrl.Builder urlBuilder = HttpUrl.parse("https://api.geoapify.com/v1/geocode/search?").newBuilder();
         urlBuilder.addQueryParameter("apiKey", apiKey);
         urlBuilder.addQueryParameter("text", addresseAchanger);
         String url = urlBuilder.build().toString();
 
+        System.out.println(url);
         Request request = new Request.Builder()
                 .url(url)
                 .method("GET", null)
@@ -162,13 +180,13 @@ public class API {
         Response response = client.newCall(request).execute();
 
         if (response.isSuccessful()) {
-            isChanged = true;
             System.out.println(response);
 
             String reponseJson = response.body().string();
 
             JSONParser jsonParser = new JSONParser();
             JSONObject jsonObject = (JSONObject) jsonParser.parse(reponseJson);
+
 
             JSONArray features = (JSONArray) jsonObject.get("features");
             JSONObject idk = (JSONObject) features.get(0);
@@ -181,20 +199,24 @@ public class API {
             latLongToBreturned.add(latitudeClient);
             latLongToBreturned.add(longitudeClient);
 
-        } else {
-            isChanged = false;
         }
         return latLongToBreturned;
     }
 
     public void TrouverLaRouteOptimale(String data) throws IOException, ParseException {
+        Gson g = new Gson();
+        String dataJson = g.toJson(data);
+
+        System.out.println(dataJson);
+
+
         URL url = new URL("https://api.geoapify.com/v1/routeplanner?apiKey=fe815e1c9fc94281b1416e7493715f05");
         HttpURLConnection http = (HttpURLConnection) url.openConnection();
         http.setRequestMethod("POST");
         http.setDoOutput(true);
         http.setRequestProperty("Content-Type", "application/json");
 
-        byte[] out = data.getBytes(StandardCharsets.UTF_8);
+        byte[] out = dataJson.getBytes(StandardCharsets.UTF_8);
 
         OutputStream stream = http.getOutputStream();
         stream.write(out);
@@ -204,14 +226,15 @@ public class API {
         InputStream inputStream = http.getInputStream();
         JSONParser jsonParser = new JSONParser();
         JSONObject jsonObject = (JSONObject) jsonParser.parse(new InputStreamReader(inputStream, "UTF-8"));
+        System.out.println(jsonObject);
 
-        JSONArray features = (JSONArray) jsonObject.get("features");
-        JSONObject transition = (JSONObject) features.get(0);
-        JSONObject geometry = (JSONObject) transition.get("geometry");
-        JSONArray coordinates = (JSONArray) geometry.get("coordinates");
-
-//        System.out.println(transition);
-        System.out.println(geometry.toJSONString());
+//        JSONArray features = (JSONArray) jsonObject.get("features");
+//        JSONObject transition = (JSONObject) features.get(0);
+//        JSONObject geometry = (JSONObject) transition.get("geometry");
+//        JSONArray coordinates = (JSONArray) geometry.get("coordinates");
+//
+////        System.out.println(transition);
+//        System.out.println(geometry.toJSONString());
         http.disconnect();
     }
 

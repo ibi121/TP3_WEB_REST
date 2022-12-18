@@ -10,14 +10,26 @@ public class Client {
     private String adresse;
     private List<String> latLong;
 
-    public Client(int id, String nom, String adresse) {
+    private String addresseFormatter;
+
+
+    public Client(int id, String nom, String adresse, String addresseFormatter) {
         this.id = id;
         this.nom = nom;
         this.adresse = adresse;
         this.latLong = new ArrayList<>();
+        this. addresseFormatter = addresseFormatter;
     }
 
     public Client() {
+    }
+
+    public String getAddresseFormatter() {
+        return addresseFormatter;
+    }
+
+    public void setAddresseFormatter(String addresseFormatter) {
+        this.addresseFormatter = addresseFormatter;
     }
 
     public List<String> getLatLong() {
