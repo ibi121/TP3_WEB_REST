@@ -1,0 +1,24 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h3 class="display-4">Bonjour livreur 123445, voici vos livraisons</h3>
+    <div>
+        <ol id="products"></ol>
+    </div>
+    <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.0.3.min.js"></script>
+    <script>
+        var uri = 'http://localhost:8080/adresses';
+
+        $(document).ready(function () {
+      $.getJSON(uri)
+          .done(function (data) {
+            $.each(data, function (key, item) {
+              $('<li>', { text: item }).appendTo($('#products'));
+            });
+          });
+    });
+
+    </script>
+</div>
