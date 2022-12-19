@@ -32,7 +32,7 @@ import java.util.Map;
  *
  * En gros, nous avons des requetes qui ne retourne pas les bonne choses.
  *
- * 
+ *
  */
 
 @Component
@@ -58,7 +58,7 @@ public class API {
      */
     public boolean AddresseFormattedForSending(){
         for (Client client: this.gestionClients.getListeAdresseClient()) {
-            String adresseOriginal = client.getAdresse();
+            String adresseOriginal =client.getAdresse();
             System.out.println(adresseOriginal);
             adresseOriginal = adresseOriginal.replace("-", "%2D");
             adresseOriginal = adresseOriginal.replace("é", "e");
@@ -85,7 +85,7 @@ public class API {
                 client.setLatLong(this.ChangerAdresseEnLatLong(client.getAddresseFormatter()));
             }
         }
-        return false;
+        return true;
     }
 
 
@@ -100,7 +100,7 @@ public class API {
             entrepot.setLatLong(this.ChangerAdresseEnLatLong(entrepot.getAdresse()));
         }
 
-        return false;
+        return true;
 
     }
 
@@ -113,36 +113,31 @@ public class API {
      *
      * bye --JauneAttend
      */
-//    public String CreerRequeteDepart() throws IOException, ParseException {
-//        JsonObjectModified requeteDate = new JsonObjectModified();
-//        JSONArray jobs = new JSONArray();
-//        JSONArray agents = new JSONArray();
-//
-//        if (AjouterLatLongEntrpot() && AjouterLatLongCLient()) {
-//            JSONObject requeteAgent = new JSONObject();
-//            requeteAgent.put("start_location", this.gestionEntrepot.getListeAdresseEntrepot().get(0).getLatLong());
-//            requeteAgent.put("end_location", this.gestionEntrepot.getListeAdresseEntrepot().get(0).getLatLong());
-//            requeteAgent.put("pickup_capacity", 4);
-//
-//            agents.add(requeteAgent);
-//
-//            for (Client client:this.gestionClients.getListeAdresseClient()) {
-//                JSONObject requqteClient = new JSONObject();
-//
-//                requqteClient.put("location", client.getLatLong());
-//                requqteClient.put("duration", 300);
-//                requqteClient.put("pickup_amount", 1);
-//
-//                jobs.add(requqteClient);
-//            }
-//        }else {
-//            System.out.println("not working");
-//        }
-//
-//        System.out.println(requeteDate.CustomJsonObject(agents, jobs).toJSONString());
-//        return requeteDate.CustomJsonObject(agents, jobs).toJSONString();
-//    }
-//
+    public String CreerRequeteDepart() throws IOException, ParseException {
+        JsonObjectModified requeteDate = new JsonObjectModified();
+        JSONArray jobs = new JSONArray();
+        JSONArray agents = new JSONArray();
+
+        if (AjouterLatLongEntrpot() && AjouterLatLongCLient()) {
+            JSONObject requeteAgent = new JSONObject();
+            requeteAgent.put("start_location", this.gestionEntrepot.getListeAdresseEntrepot().get(0).getLatLong());
+            requeteAgent.put("end_location", this.gestionEntrepot.getListeAdresseEntrepot().get(0).getLatLong());
+            requeteAgent.put("pickup_capacity", 10);
+
+            agents.add(requeteAgent);
+
+            for (Client client:this.gestionClients.getListeAdresseClient()) {
+                JSONObject requqteClient = new JSONObject();
+
+                requqteClient.put("location", client.getLatLong());
+                requqteClient.put("duration", 100);
+                requqteClient.put("pickup_amount", 1);
+
+                jobs.add(requqteClient);
+            }
+        }
+        return requeteDate.CustomJsonObject(agents, jobs).toJSONString();
+    }
 
 
     /**
@@ -167,12 +162,8 @@ public class API {
                 .build();
 
 
-        HttpUrl.Builder urlBuilder = HttpUrl.parse("https://api.geoapify.com/v1/geocode/search?").newBuilder();
-        urlBuilder.addQueryParameter("apiKey", apiKey);
-        urlBuilder.addQueryParameter("text", addresseAchanger);
-        String url = urlBuilder.build().toString();
+        URL url = new URL("https://api.geoapify.com/v1/geocode/search?&apiKey="+apiKey+"&text="+addresseAchanger);
 
-        System.out.println(url);
         Request request = new Request.Builder()
                 .url(url)
                 .method("GET", null)
@@ -180,13 +171,10 @@ public class API {
         Response response = client.newCall(request).execute();
 
         if (response.isSuccessful()) {
-            System.out.println(response);
 
             String reponseJson = response.body().string();
-
             JSONParser jsonParser = new JSONParser();
             JSONObject jsonObject = (JSONObject) jsonParser.parse(reponseJson);
-
 
             JSONArray features = (JSONArray) jsonObject.get("features");
             JSONObject idk = (JSONObject) features.get(0);
@@ -196,19 +184,16 @@ public class API {
             String latitudeClient = properties.get("lat").toString();
 
 
-            latLongToBreturned.add(latitudeClient);
             latLongToBreturned.add(longitudeClient);
+            latLongToBreturned.add(latitudeClient);
+
+            System.out.println(latLongToBreturned);
 
         }
         return latLongToBreturned;
     }
 
     public void TrouverLaRouteOptimale(String data) throws IOException, ParseException {
-        Gson g = new Gson();
-        String dataJson = g.toJson(data);
-
-        System.out.println(dataJson);
-
 
         URL url = new URL("https://api.geoapify.com/v1/routeplanner?apiKey=fe815e1c9fc94281b1416e7493715f05");
         HttpURLConnection http = (HttpURLConnection) url.openConnection();
@@ -216,26 +201,26 @@ public class API {
         http.setDoOutput(true);
         http.setRequestProperty("Content-Type", "application/json");
 
-        byte[] out = dataJson.getBytes(StandardCharsets.UTF_8);
+        byte[] out = data.getBytes(StandardCharsets.UTF_8);
 
         OutputStream stream = http.getOutputStream();
         stream.write(out);
-
-        System.out.println(http.getResponseCode() + " " + http.getResponseMessage());
-
         InputStream inputStream = http.getInputStream();
         JSONParser jsonParser = new JSONParser();
         JSONObject jsonObject = (JSONObject) jsonParser.parse(new InputStreamReader(inputStream, "UTF-8"));
-        System.out.println(jsonObject);
 
-//        JSONArray features = (JSONArray) jsonObject.get("features");
-//        JSONObject transition = (JSONObject) features.get(0);
-//        JSONObject geometry = (JSONObject) transition.get("geometry");
-//        JSONArray coordinates = (JSONArray) geometry.get("coordinates");
-//
-////        System.out.println(transition);
-//        System.out.println(geometry.toJSONString());
+        JSONArray features = (JSONArray) jsonObject.get("features");
+        JSONObject transition = (JSONObject) features.get(0);
+        JSONObject geometry = (JSONObject) transition.get("geometry");
+        JSONArray coordinates = (JSONArray) geometry.get("coordinates");
+
+//        System.out.println(transition);
+        System.out.println(coordinates);
         http.disconnect();
+    }
+
+    public void lancerApp() throws IOException, ParseException {
+        TrouverLaRouteOptimale(this.CreerRequeteDepart());
     }
 
     //Demande la liste original de clients, prends juste les addresses

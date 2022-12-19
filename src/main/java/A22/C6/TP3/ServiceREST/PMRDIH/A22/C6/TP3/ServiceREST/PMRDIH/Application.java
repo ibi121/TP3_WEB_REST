@@ -28,7 +28,9 @@ public class Application {
 
 //        api.ChangerAdresseEnLatLong("131 Rue Principale, Metis%2Dsur%2DMer, QC G0J 1S0");
 
-        api.AjouterLatLongCLient();
+//        api.CreerRequeteDepart();
+
+        api.lancerApp();
 
     }
 

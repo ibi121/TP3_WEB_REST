@@ -29,7 +29,7 @@ public class JsonObjectModified {
         }
 
         jsonObject.put("mode", "drive");
-        jsonObject.put("agens", agents);
+        jsonObject.put("agents", agents);
         jsonObject.put("jobs", jobs);
 
         return jsonObject;
