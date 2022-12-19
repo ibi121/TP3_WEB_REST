@@ -190,6 +190,15 @@ public class API {
         return latLongToBreturned;
     }
 
+    /**
+     * Envois une requete POST vers le fournisseur Geoapify,
+     *Recois en param un String Data qui est le point longitude latitude a verifier.
+     * Retourne un object JSONArray qui contient les reponse des routes.
+     * @param data
+     * @return
+     * @throws IOException
+     * @throws ParseException
+     */
     public JSONArray TrouverLaRouteOptimale(String data) throws IOException, ParseException {
 
         URL url = new URL("https://api.geoapify.com/v1/routeplanner?apiKey=fe815e1c9fc94281b1416e7493715f05");
@@ -244,10 +253,11 @@ public class API {
         }
     }
 
-    public void testFetchBD(){
-        System.out.println(BD.fetchRoute());
-    }
-
+    /**
+     * Lance l'application :o)
+     * @throws IOException
+     * @throws ParseException
+     */
     public void lancerApp() throws IOException, ParseException {
         SauvegarderEnBD();
     }
