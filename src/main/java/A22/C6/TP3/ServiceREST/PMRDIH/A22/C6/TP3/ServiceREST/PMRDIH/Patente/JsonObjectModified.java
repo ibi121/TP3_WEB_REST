@@ -12,7 +12,8 @@ import java.util.LinkedHashMap;
 /**
  * Modifie la classe internet du JSON object
  * lui donne une linkedHashMap au lieu d'un hasmap
- * pour lui donner un ordre dans ses requetesa :o)
+ * pour lui donner un ordre dans ses requetes
+ * Recoit en param un JSONArray d'agents ainsi qu'un JSONArray de jobs pour y creer sa requete.
  */
 @Slf4j
 public class JsonObjectModified {

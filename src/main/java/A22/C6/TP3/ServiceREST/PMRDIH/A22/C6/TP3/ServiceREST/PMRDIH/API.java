@@ -55,7 +55,8 @@ public class API {
     }
 
     /**
-     * Adresses are formatted and returned
+     * Format les caractere spéciaux dans un URL vers les caractere demandé.
+     * Elle retourne une boolean pour s'assurer que le loop a été executé
      * @return
      */
     public boolean AddresseFormattedForSending(){
@@ -87,7 +88,9 @@ public class API {
 
 
     /**
-     * Meme chose, mais pour l'entrepot :o)
+     * Lis toutes les addresses des entrepots,
+     * Elle appel la méthode SetLatLong qui elle a besoin d'une adresse
+     * Elle va, du meme coups, set la latitude et la longitude de lèobject entrepot avec la reponse de la méthode.
      *
      * @throws IOException
      * @throws ParseException
@@ -102,13 +105,12 @@ public class API {
     }
 
     /**
-     * Update, ca fonctionne ish.. la requete se creer
-     * mais les jobs viennet avanmt les agents alors que ca devrait etre the other way around.
-     * idk why,
-     * si vous essayer : https://myprojects.geoapify.com/api/PmaKvLtvGdCDfeLfE5PV/keys
-     * Suivre le liens pour voir ca ressemble a quoi le body.
+     * Creer la requete JSON avec les param demandé
      *
-     * bye --JauneAttend
+     * doit respecter le format disponible dans ce liens : https://apidocs.geoapify.com/docs/route-planner/#about
+     *
+     * Elle retourne en String un Object JsonObjectModified.
+     *
      */
     public String CreerRequeteDepart() throws IOException, ParseException {
         JsonObjectModified requeteDate = new JsonObjectModified();
@@ -142,7 +144,9 @@ public class API {
      * fait un appel POST a geoapify, geocoding,
      * Tri le JSON pour y prendre la Lat et Long
      * Les rajoute dans une liste
-     * et les retourne a la methode AjouterLatLongClient.
+     * et les retourne a la methode AjouterLatLongClient().
+     *
+     * A besoin du APIKEy fournis dans le code, peut etre changé selon le projet
      *
      * @param addresseAchanger
      * @return
@@ -192,7 +196,7 @@ public class API {
 
     /**
      * Envois une requete POST vers le fournisseur Geoapify,
-     *Recois en param un String Data qui est le point longitude latitude a verifier.
+     * Recois en param un String Data qui est le point longitude latitude a verifier (Methode ChangerAdresseEnLatLong).
      * Retourne un object JSONArray qui contient les reponse des routes.
      * @param data
      * @return
@@ -226,10 +230,13 @@ public class API {
     }
 
     /**
-     * Inserer dans la BD fonctionne,
-     * Presentement elle ne fonctionne pas du au commentaire..
-     * Elle prendre les lat long de la route et verifie si elles sont egale aux lat long des clients
-     * si oui, elle rajouten en BD le nom des clients.
+     *Méthode sauvegarder dans la BD
+     * Elle prends tous les objects coordonnées recu de la méthode TrouverRouteOptimale
+     * Elle compare les LatLOng recu avec avec LatLong disponible dans l'objet CLient.
+     * Elle va chercher le nom des clients dans l'ordre de la route.
+     * Elle Sauvegarde en BD la route optimale avec les nom de clients.
+     *
+     * Présentement en commentaire pour éviter les doublons de route en BD.
      * @throws IOException
      * @throws ParseException
      */
