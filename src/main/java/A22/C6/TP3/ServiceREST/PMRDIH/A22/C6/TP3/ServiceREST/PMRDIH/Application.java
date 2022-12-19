@@ -19,17 +19,6 @@ public class Application {
         SpringApplication.run(Application.class, args);
         API api = new API();
 
-//        List<String> listeAddresse = new ArrayList<>();
-        GestionClients gc = new GestionClients();
-        ServiceRestClient serviceRestClient = new ServiceRestClient();
-//
-//        api.TrouverLaRouteOptimale(api.CreerRequeteDepart());
-//        api.AddresseFormattedForSending();
-
-//        api.ChangerAdresseEnLatLong("131 Rue Principale, Metis%2Dsur%2DMer, QC G0J 1S0");
-
-//        api.CreerRequeteDepart();
-
         api.lancerApp();
 
     }

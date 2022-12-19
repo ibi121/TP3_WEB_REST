@@ -2,6 +2,7 @@ package A22.C6.TP3.ServiceREST.PMRDIH.A22.C6.TP3.ServiceREST.PMRDIH.REST;
 
 
 import A22.C6.TP3.ServiceREST.PMRDIH.A22.C6.TP3.ServiceREST.PMRDIH.BD.BD;
+import A22.C6.TP3.ServiceREST.PMRDIH.A22.C6.TP3.ServiceREST.PMRDIH.BD.DbManager;
 import A22.C6.TP3.ServiceREST.PMRDIH.A22.C6.TP3.ServiceREST.PMRDIH.modele.Client;
 import A22.C6.TP3.ServiceREST.PMRDIH.A22.C6.TP3.ServiceREST.PMRDIH.Gestion.GestionClients;
 import org.springframework.http.HttpStatus;
@@ -17,11 +18,11 @@ public class ServiceRestClient {
 
     private GestionClients gestionClients;
 
-    private BD bd;
+    private DbManager bd;
 
     public ServiceRestClient() {
         this.gestionClients = new GestionClients();
-        this.bd = new BD();
+        this.bd = new DbManager();
     }
 
     @GetMapping(value = "/adresses")
@@ -45,7 +46,7 @@ public class ServiceRestClient {
     @GetMapping(value = "/routeOptimal")
     public List<String> getRouteOptimale(){
         List<String> latLong = new ArrayList<>();
-        latLong = bd.getMeilleureRoute();
+        latLong = bd.fetchRoute();
         return latLong;
     }
 

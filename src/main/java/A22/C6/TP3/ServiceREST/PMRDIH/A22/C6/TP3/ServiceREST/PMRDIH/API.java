@@ -1,11 +1,12 @@
 package A22.C6.TP3.ServiceREST.PMRDIH.A22.C6.TP3.ServiceREST.PMRDIH;
 
+import A22.C6.TP3.ServiceREST.PMRDIH.A22.C6.TP3.ServiceREST.PMRDIH.BD.DbManager;
 import A22.C6.TP3.ServiceREST.PMRDIH.A22.C6.TP3.ServiceREST.PMRDIH.Gestion.GestionClients;
 import A22.C6.TP3.ServiceREST.PMRDIH.A22.C6.TP3.ServiceREST.PMRDIH.Gestion.GestionEntrepot;
 import A22.C6.TP3.ServiceREST.PMRDIH.A22.C6.TP3.ServiceREST.PMRDIH.Patente.JsonObjectModified;
 import A22.C6.TP3.ServiceREST.PMRDIH.A22.C6.TP3.ServiceREST.PMRDIH.modele.Client;
 import A22.C6.TP3.ServiceREST.PMRDIH.A22.C6.TP3.ServiceREST.PMRDIH.modele.Entrepot;
-import com.google.gson.Gson;
+import A22.C6.TP3.ServiceREST.PMRDIH.A22.C6.TP3.ServiceREST.PMRDIH.modele.RouteOptimale;
 import okhttp3.*;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -40,7 +41,8 @@ public class API {
 
     private GestionClients gestionClients = new GestionClients();
     private GestionEntrepot gestionEntrepot = new GestionEntrepot();
-    String urlTobDeleted = "";
+    private DbManager BD = new DbManager();
+
 
     @Autowired
     public void setGestionClients(GestionClients gestionClients) {
@@ -59,15 +61,10 @@ public class API {
     public boolean AddresseFormattedForSending(){
         for (Client client: this.gestionClients.getListeAdresseClient()) {
             String adresseOriginal =client.getAdresse();
-            System.out.println(adresseOriginal);
             adresseOriginal = adresseOriginal.replace("-", "%2D");
             adresseOriginal = adresseOriginal.replace("é", "e");
             adresseOriginal = adresseOriginal.replace("'", "%27");
-
             client.setAddresseFormatter(adresseOriginal);
-
-            System.out.println(client.getAddresseFormatter());
-
         }
         return true;
 
@@ -193,7 +190,7 @@ public class API {
         return latLongToBreturned;
     }
 
-    public void TrouverLaRouteOptimale(String data) throws IOException, ParseException {
+    public JSONArray TrouverLaRouteOptimale(String data) throws IOException, ParseException {
 
         URL url = new URL("https://api.geoapify.com/v1/routeplanner?apiKey=fe815e1c9fc94281b1416e7493715f05");
         HttpURLConnection http = (HttpURLConnection) url.openConnection();
@@ -214,80 +211,45 @@ public class API {
         JSONObject geometry = (JSONObject) transition.get("geometry");
         JSONArray coordinates = (JSONArray) geometry.get("coordinates");
 
-//        System.out.println(transition);
-        System.out.println(coordinates);
         http.disconnect();
+
+        return coordinates;
+    }
+
+    /**
+     * Inserer dans la BD fonctionne,
+     * Presentement elle ne fonctionne pas du au commentaire..
+     * Elle prendre les lat long de la route et verifie si elles sont egale aux lat long des clients
+     * si oui, elle rajouten en BD le nom des clients.
+     * @throws IOException
+     * @throws ParseException
+     */
+    public void SauvegarderEnBD() throws IOException, ParseException {
+        JSONArray reponseRouteOptimaleEnLatLong = this.TrouverLaRouteOptimale(this.CreerRequeteDepart());
+        JSONArray reponseDeLaReponse = new JSONArray();
+        int index = 0;
+
+        for (Object reponseArray: reponseRouteOptimaleEnLatLong) {
+            JSONArray arrayReponse = (JSONArray) reponseArray;
+            reponseDeLaReponse = (JSONArray) arrayReponse.get(0);
+
+            for (Client client: this.gestionClients.getListeAdresseClient()) {
+                if(client.getLatLong().get(0).equals(String.valueOf(reponseDeLaReponse.get(0)))) {
+                    if(client.getLatLong().get(1).equals(String.valueOf(reponseDeLaReponse.get(1)))){
+//                        System.out.println(client.getNom());
+//                        BD.AjouterALABD(client.getNom().toString());
+                    }
+                }
+            }
+        }
+    }
+
+    public void testFetchBD(){
+        System.out.println(BD.fetchRoute());
     }
 
     public void lancerApp() throws IOException, ParseException {
-        TrouverLaRouteOptimale(this.CreerRequeteDepart());
-    }
-
-    //Demande la liste original de clients, prends juste les addresses
-    //Les change en jsonArray pour requetes
-    //
-
-    /**
-     * this is the caca section
-     * Must be destroyed before sending
-     * :o)
-     * Au plisir
-     * rien de neuf sous le soleil
-     */
-
-
-//        URL url = new URL("https://api.geoapify.com/v1/geocode/search?apiKey=8fc90cab489e4420b6059a1fdb9f8163");
-//        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-//        conn.setRequestProperty("Accept", "application/json");
-//        conn.setRequestMethod("GET");
-//
-//
-//        if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
-//            throw new RuntimeException("Failed : HTTP error code : " + conn.getResponseCode());
-//        }
-//
-//        InputStream inputStream = conn.getInputStream();
-//        JSONParser jsonParser = new JSONParser();
-//        JSONObject jsonObject = (JSONObject)jsonParser.parse(new InputStreamReader(inputStream, "UTF-8"));
-//        conn.disconnect();
-    public void RetrouveLatLong(List<String> listeAddresseParsed) throws IOException, ParseException {
-        List<String> listeLatLong = new ArrayList<>();
-
-        JSONArray addresseJson = new JSONArray();
-
-
-        addresseJson.addAll(listeAddresseParsed);
-
-        String data = addresseJson.toJSONString();
-
-
-        //requetes envoye
-        URL url = new URL("https://api.geoapify.com/v1/batch/geocode/search/?apiKey=fe815e1c9fc94281b1416e7493715f05");
-        HttpURLConnection http = (HttpURLConnection) url.openConnection();
-        http.setRequestMethod("POST");
-        http.setDoOutput(true);
-        http.setRequestProperty("Content-Type", "application/json");
-
-        //creer tableau de bytes pour la requetes
-        byte[] out = data.getBytes(StandardCharsets.UTF_8);
-
-        OutputStream stream = http.getOutputStream();
-        stream.write(out);
-
-        //lis la reponse
-        InputStream inputStream = http.getInputStream();
-        JSONParser jsonParser = new JSONParser();
-        JSONObject jsonObject = (JSONObject) jsonParser.parse(new InputStreamReader(inputStream, "UTF-8"));
-
-        System.out.println(jsonObject);
-
-        /**
-         * To BE DELETED, URL global qui ne doit pas exister pour l'instant :o(
-         */
-        urlTobDeleted = jsonObject.get("url").toString();
-
-        System.out.println(urlTobDeleted);
-
+        SauvegarderEnBD();
     }
 
 
